@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# != 5 ]]; then
+    echo "Usage: build-apps auto|gui|tui ALATAR ELLIPSE PLUGNIM OUTPUT" >&2
+    exit 2
+fi
+mode=$1
+core=$(realpath "$2")
+ellipse=$(realpath "$3")
+plugnim=$(realpath "$4")
+output=$(realpath -m "$5")
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+args=(--path:"$core/src" --path:"$ellipse/src" --path:"$ellipse/src/clay"
+      --path:"$plugnim/src" --path:"$root/shared" -d:release)
+cd "$root"
+
+case "$mode" in
+    auto|gui)
+        if pkg-config --exists sdl3 sdl3-image sdl3-ttf wayland-client; then
+            mode=gui
+        elif [[ $mode == gui ]]; then
+            echo "GUI builds need SDL3, SDL3_image, SDL3_ttf and Wayland development libraries." >&2
+            exit 1
+        else
+            mode=tui
+        fi
+        ;;
+    tui) ;;
+    *) echo "Unknown backend: $mode" >&2; exit 2 ;;
+esac
+
+nimble_flags=()
+if [[ ${ALATAR_OFFLINE:-0} == 1 ]]; then
+    nimble_flags+=(--offline)
+fi
+if [[ $mode == tui ]]; then
+    args+=(-d:ellipseNoSdl)
+else
+    sdl_revision=bb137829ff619b0a27a473628cb28fc1c86f3fe5
+    if ! nimble path "sdl3@#$sdl_revision" >/dev/null 2>&1; then
+        nimble "${nimble_flags[@]}" install -y "https://github.com/nim-lang/sdl3#$sdl_revision"
+    fi
+    args+=(--path:"$(nimble path "sdl3@#$sdl_revision" | tail -1)")
+fi
+if ! nimble path chroma@1.0.0 >/dev/null 2>&1; then
+    nimble "${nimble_flags[@]}" install -y 'chroma@1.0.0'
+fi
+args+=(--path:"$(nimble path chroma@1.0.0 | tail -1)")
+mkdir -p "$output"
+for spec in nomicon/nomicon:nomicon-settings nomicon/launcher:nomicon-launcher systemdui/systemdui:systemdui processui/processui:processui; do
+    app=${spec%:*}
+    nim c "${args[@]}" --out:"$output/${spec#*:}" "${app%/*}/src/${app#*/}.nim"
+done

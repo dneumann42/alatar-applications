@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "title": "Run a command when a file appears",
+  "description": "Watch for a file to appear. The command should process and remove or move the file.",
+  "activation": "Enable and start the path watcher. A file that remains present can trigger the service again.",
+  "inputs": [
+    {"id": "command", "label": "Command", "type": "command", "hint": "/usr/bin/my-program --option"},
+    {"id": "directory", "label": "Working directory", "type": "path", "hint": "/absolute/path (optional)", "required": false},
+    {"id": "watched", "label": "File to watch", "type": "path", "hint": "/absolute/path/to/file"}
+  ],
+  "units": [
+    { "type": "service", "directives": [
+      {"section": "Service", "key": "Type", "value": {"text": "oneshot"}},
+      {"section": "Service", "key": "ExecStart", "value": {"input": "command"}},
+      {"section": "Service", "key": "WorkingDirectory", "value": {"input": "directory"}}
+    ] },
+    { "type": "path", "directives": [
+      {"section": "Path", "key": "Unit", "value": {"unit": "service"}},
+      {"section": "Path", "key": "PathExists", "value": {"input": "watched"}},
+      {"section": "Install", "key": "WantedBy", "value": {"text": "paths.target"}}
+    ] }
+  ]
+}

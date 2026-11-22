@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "title": "Keep a background program running",
+  "description": "Start a foreground program at login or boot and restart it when it fails.",
+  "activation": "Enable and start the service.",
+  "inputs": [
+    {"id": "command", "label": "Command", "type": "command", "hint": "/usr/bin/my-program --option"},
+    {"id": "directory", "label": "Working directory", "type": "path", "hint": "/absolute/path (optional)", "required": false},
+    {"id": "restart", "label": "Wait before restarting", "type": "duration", "default": {"amount": 5, "unit": "seconds"}}
+  ],
+  "units": [
+    { "type": "service", "directives": [
+      {"section": "Service", "key": "Type", "value": {"text": "exec"}},
+      {"section": "Service", "key": "ExecStart", "value": {"input": "command"}},
+      {"section": "Service", "key": "WorkingDirectory", "value": {"input": "directory"}},
+      {"section": "Service", "key": "Restart", "value": {"text": "on-failure"}},
+      {"section": "Service", "key": "RestartSec", "value": {"input": "restart"}},
+      {"section": "Install", "key": "WantedBy", "value": {"startupTarget": true}}
+    ] }
+  ]
+}

@@ -1,0 +1,22 @@
+# nimble build artifacts (statusbar module has same list in its own .gitignore)
+nimble.develop
+nimble.paths
+nimbledeps
+nimble.cache
+
+# compiled binaries — rebuilt by `nimble build` / `make bin/alatar`
+bin/
+
+# generated logs
+install.log
+build.log
+
+# editor / backup droppings
+*~
+*.bak
+\#*\#
+
+# local env (see .env.example)
+.env
+build/
+nimble.lock

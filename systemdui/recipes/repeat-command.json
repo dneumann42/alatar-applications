@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "title": "Run a command on a repeating timer",
+  "description": "Run a short task every 10 seconds by default. Choose any interval from seconds to days.",
+  "activation": "Enable and start the timer. The first run is after one interval; systemd keeps at most one copy of the service active.",
+  "inputs": [
+    {"id": "command", "label": "Command", "type": "command", "hint": "/usr/bin/my-program --option"},
+    {"id": "directory", "label": "Working directory", "type": "path", "hint": "/absolute/path (optional)", "required": false},
+    {"id": "interval", "label": "Repeat every", "type": "duration", "default": {"amount": 10, "unit": "seconds"}}
+  ],
+  "units": [
+    { "type": "service", "directives": [
+      {"section": "Service", "key": "Type", "value": {"text": "oneshot"}},
+      {"section": "Service", "key": "ExecStart", "value": {"input": "command"}},
+      {"section": "Service", "key": "WorkingDirectory", "value": {"input": "directory"}}
+    ] },
+    { "type": "timer", "directives": [
+      {"section": "Timer", "key": "Unit", "value": {"unit": "service"}},
+      {"section": "Timer", "key": "OnActiveSec", "value": {"input": "interval"}},
+      {"section": "Timer", "key": "OnUnitActiveSec", "value": {"input": "interval"}},
+      {"section": "Timer", "key": "AccuracySec", "value": {"text": "1s"}},
+      {"section": "Install", "key": "WantedBy", "value": {"text": "timers.target"}}
+    ] }
+  ]
+}

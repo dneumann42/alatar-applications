@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "Run a command at login or boot",
+  "description": "Run a short task once when the user or system manager starts.",
+  "activation": "Enable the service to run it at the next login or boot.",
+  "inputs": [
+    {"id": "command", "label": "Command", "type": "command", "hint": "/usr/bin/my-program --option"},
+    {"id": "directory", "label": "Working directory", "type": "path", "hint": "/absolute/path (optional)", "required": false}
+  ],
+  "units": [
+    { "type": "service", "directives": [
+      {"section": "Service", "key": "Type", "value": {"text": "oneshot"}},
+      {"section": "Service", "key": "ExecStart", "value": {"input": "command"}},
+      {"section": "Service", "key": "WorkingDirectory", "value": {"input": "directory"}},
+      {"section": "Install", "key": "WantedBy", "value": {"startupTarget": true}}
+    ] }
+  ]
+}

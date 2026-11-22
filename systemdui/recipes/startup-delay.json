@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "title": "Run a command after a startup delay",
+  "description": "Run a short task once after its timer starts.",
+  "activation": "Enable the timer to run after the user or system manager starts.",
+  "inputs": [
+    {"id": "command", "label": "Command", "type": "command", "hint": "/usr/bin/my-program --option"},
+    {"id": "directory", "label": "Working directory", "type": "path", "hint": "/absolute/path (optional)", "required": false},
+    {"id": "delay", "label": "Startup delay", "type": "duration", "default": {"amount": 30, "unit": "seconds"}}
+  ],
+  "units": [
+    { "type": "service", "directives": [
+      {"section": "Service", "key": "Type", "value": {"text": "oneshot"}},
+      {"section": "Service", "key": "ExecStart", "value": {"input": "command"}},
+      {"section": "Service", "key": "WorkingDirectory", "value": {"input": "directory"}}
+    ] },
+    { "type": "timer", "directives": [
+      {"section": "Timer", "key": "Unit", "value": {"unit": "service"}},
+      {"section": "Timer", "key": "OnActiveSec", "value": {"input": "delay"}},
+      {"section": "Timer", "key": "AccuracySec", "value": {"text": "1s"}},
+      {"section": "Install", "key": "WantedBy", "value": {"text": "timers.target"}}
+    ] }
+  ]
+}

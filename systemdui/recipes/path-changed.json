@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "title": "Run a command when a path changes",
+  "description": "Watch a file or directory and run a command when systemd detects a change.",
+  "activation": "Enable and start the path watcher.",
+  "inputs": [
+    {"id": "command", "label": "Command", "type": "command", "hint": "/usr/bin/my-program --option"},
+    {"id": "directory", "label": "Working directory", "type": "path", "hint": "/absolute/path (optional)", "required": false},
+    {"id": "watched", "label": "Path to watch", "type": "path", "hint": "/absolute/path"}
+  ],
+  "units": [
+    { "type": "service", "directives": [
+      {"section": "Service", "key": "Type", "value": {"text": "oneshot"}},
+      {"section": "Service", "key": "ExecStart", "value": {"input": "command"}},
+      {"section": "Service", "key": "WorkingDirectory", "value": {"input": "directory"}}
+    ] },
+    { "type": "path", "directives": [
+      {"section": "Path", "key": "Unit", "value": {"unit": "service"}},
+      {"section": "Path", "key": "PathChanged", "value": {"input": "watched"}},
+      {"section": "Install", "key": "WantedBy", "value": {"text": "paths.target"}}
+    ] }
+  ]
+}

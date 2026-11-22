@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "title": "Run a command on a calendar schedule",
+  "description": "Choose a time for a daily, weekday, or weekly job, or pick a specific date.",
+  "activation": "Enable and start the timer. The schedule uses the machine\u2019s local time.",
+  "inputs": [
+    {"id": "command", "label": "Command", "type": "command", "hint": "/usr/bin/my-program --option"},
+    {"id": "directory", "label": "Working directory", "type": "path", "hint": "/absolute/path (optional)", "required": false},
+    {"id": "schedule", "label": "Schedule", "type": "calendar"},
+    {"id": "persistent", "label": "Catch up after downtime", "type": "toggle", "default": true}
+  ],
+  "units": [
+    { "type": "service", "directives": [
+      {"section": "Service", "key": "Type", "value": {"text": "oneshot"}},
+      {"section": "Service", "key": "ExecStart", "value": {"input": "command"}},
+      {"section": "Service", "key": "WorkingDirectory", "value": {"input": "directory"}}
+    ] },
+    { "type": "timer", "directives": [
+      {"section": "Timer", "key": "Unit", "value": {"unit": "service"}},
+      {"section": "Timer", "key": "OnCalendar", "value": {"input": "schedule"}},
+      {"section": "Timer", "key": "Persistent", "value": {"input": "persistent"}},
+      {"section": "Install", "key": "WantedBy", "value": {"text": "timers.target"}}
+    ] }
+  ]
+}
