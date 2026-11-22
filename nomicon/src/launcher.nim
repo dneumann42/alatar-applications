@@ -3,21 +3,24 @@ import std/[os, osproc]
 import ellipse_ui
 import ellipse_ui/keys
 from ellipse/platform/platform import quit
+from ellipse/platform/termmode import terminalMode
 
 import alatar/[desktopchrome, desktopmode, desktoptheme]
 import nomicon/[attachment, widgets]
 
 var launchError {.threadvar.}: string
+var terminalChild {.threadvar.}: string
 
 proc launchSystemdui() =
-  var executable = findExe("systemdui")
-  if executable.len == 0:
-    let project = getHomeDir() / "Workspace" / "systemdui"
-    for path in [project / "bin" / "systemdui", project / "build" / "systemdui"]:
-      executable = findExe(path)
-      if executable.len > 0: break
+  let sibling = getAppDir() / "systemdui"
+  let executable = if fileExists(sibling): sibling else: findExe("systemdui")
   if executable.len == 0:
     launchError = "Could not find the systemdui executable."
+    return
+
+  if terminalMode():
+    terminalChild = executable
+    platform.quit()
     return
 
   try:
@@ -49,3 +52,11 @@ proc view() {.gcsafe.} =
 when isMainModule:
   run App(window: nomiconWindow("nomicon-launcher", 320, 156, commandLineParams()),
           setup: installChrome, view: view)
+  if terminalChild.len > 0:
+    try:
+      let child = startProcess(terminalChild, args = @["--tui"],
+                               options = {poParentStreams})
+      defer: close(child)
+      quit(waitForExit(child))
+    except CatchableError as error:
+      quit("Could not launch systemdui: " & error.msg, 1)
