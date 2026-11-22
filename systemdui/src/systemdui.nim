@@ -1,7 +1,8 @@
 import std/[cmdline, options, os, sequtils, strutils]
 import ellipse_ui
 
-import systemdui/[classicTheme, recipeWizard, systemdFile, systemdIO, timerValues, unitEditor]
+import systemdfile
+import systemdui/[classicTheme, recipeWizard, systemdIO, timerValues, unitEditor]
 
 const
   NewUnitMenu = "+ New service"

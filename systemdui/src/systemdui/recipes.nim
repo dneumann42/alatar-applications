@@ -1,5 +1,6 @@
 import std/[algorithm, json, os, sequtils, streams, strutils, times]
-import ./[systemdFile, systemdIO, timerValues, unitEditor]
+import systemdfile
+import ./[systemdIO, timerValues, unitEditor]
 
 type
   RecipeValueKind* = enum

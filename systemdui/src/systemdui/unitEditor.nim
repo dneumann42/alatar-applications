@@ -1,5 +1,6 @@
 import std/[cmdline, os, osproc, sequtils, streams, strutils, tempfiles]
-import ./[systemdFile, systemdIO]
+import systemdfile
+import ./[systemdIO]
 
 type
   GeneratedUnit* = tuple[name, content: string]

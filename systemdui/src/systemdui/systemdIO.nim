@@ -1,5 +1,5 @@
 import std/[osproc, paths, sequtils, sets, streams, strutils, sugar, os]
-import ./systemdFile
+import systemdfile
 
 type SystemdService* = object
   name*, path*: string

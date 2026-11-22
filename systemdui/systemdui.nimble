@@ -18,3 +18,5 @@ switch("lineTrace", "on")
 switch("excessiveStackTrace", "on")
 switch("debugger", "native")
 switch("ic", "on")
+
+requires "https://github.com/dneumann42/systemdfile >= 0.1.0"

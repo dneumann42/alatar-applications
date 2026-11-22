@@ -47,6 +47,14 @@ if ! nimble path chroma@1.0.0 >/dev/null 2>&1; then
     nimble "${nimble_flags[@]}" install -y 'chroma@1.0.0'
 fi
 args+=(--path:"$(nimble path chroma@1.0.0 | tail -1)")
+if ! nimble path systemdfile >/dev/null 2>&1; then
+    nimble "${nimble_flags[@]}" install -y https://github.com/dneumann42/systemdfile
+fi
+systemdfile=$(nimble path systemdfile | tail -1)
+if [[ ! -f $systemdfile/systemdfile.nim ]]; then
+    systemdfile="$systemdfile/src"
+fi
+args+=(--path:"$systemdfile")
 mkdir -p "$output"
 for spec in nomicon/nomicon:nomicon-settings nomicon/launcher:nomicon-launcher systemdui/systemdui:systemdui processui/processui:processui; do
     app=${spec%:*}

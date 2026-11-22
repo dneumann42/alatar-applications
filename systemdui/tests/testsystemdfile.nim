@@ -1,5 +1,6 @@
 import std/[streams, strutils, unittest]
-import ../src/systemdui/[systemdFile, unitEditor]
+import systemdfile
+import ../src/systemdui/unitEditor
 
 suite "systemd files":
   test "ordered sections and directives, including repeated keys and resets":
